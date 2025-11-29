@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RVRJC Academic Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ea580c', // Orange-600
+                        primaryHover: '#c2410c', // Orange-700
+                        lightBg: '#fafafa',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .active-nav {
+            color: #ea580c;
+            border-bottom: 2px solid #ea580c;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md fixed w-full z-50 top-0">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-3xl text-primary"></i>
+                        <span class="font-extrabold text-2xl tracking-tight text-gray-900">RVRJC <span class="text-primary">Internals</span></span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active-nav inline-flex items-center px-1 pt-1 text-sm font-semibold text-gray-900 hover:text-primary transition">Internals</button>
+                    <button onclick="switchTab('sgpa')" id="nav-sgpa" class="nav-btn inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-primary transition">SGPA</button>
+                    <button onclick="switchTab('cgpa')" id="nav-cgpa" class="nav-btn inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-primary transition">CGPA</button>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button onclick="toggleMenu()" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="sm:hidden hidden bg-white border-t" id="mobile-menu">
+            <div class="space-y-1 pt-2 pb-3">
+                <button onclick="switchTab('dashboard'); toggleMenu()" class="block w-full text-left pl-3 pr-4 py-2 border-l-4 border-primary text-base font-medium text-primary bg-orange-50">Internals</button>
+                <button onclick="switchTab('sgpa'); toggleMenu()" class="block w-full text-left pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">SGPA</button>
+                <button onclick="switchTab('cgpa'); toggleMenu()" class="block w-full text-left pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">CGPA</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto min-h-screen">
+        
+        <!-- SECTION 1: INTERNAL MARKS CALCULATOR -->
+        <div id="dashboard" class="app-section fade-in">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                <div class="bg-primary px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calculator"></i> Internal Marks Calculator
+                    </h2>
+                </div>
+                
+                <div class="p-8">
+                    <form id="internalForm" onsubmit="calculateInternals(event)" class="space-y-6">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Sectionals -->
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                                <h3 class="text-lg font-semibold text-primary mb-3">Sectionals (Max 18)</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Sessional 1</label>
+                                        <input type="number" id="sm1" required max="18" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 border">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Sessional 2</label>
+                                        <input type="number" id="sm2" required max="18" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 border">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Assignments -->
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                                <h3 class="text-lg font-semibold text-primary mb-3">Assignments (Max 12)</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Assignment 1</label>
+                                        <input type="number" id="as1" required max="12" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 border">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Assignment 2</label>
+                                        <input type="number" id="as2" required max="12" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 border">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quizzes -->
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                                <h3 class="text-lg font-semibold text-primary mb-3">Quizzes (Max 12)</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Quiz 1</label>
+                                        <input type="number" id="q1" required max="12" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 border">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Quiz 2</label>
+                                        <input type="number" id="q2" required max="12" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 border">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Attendance -->
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 flex flex-col justify-center">
+                                <h3 class="text-lg font-semibold text-primary mb-3">Attendance</h3>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Percentage (%)</label>
+                                    <input type="number" id="at" required max="100" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2.5 border">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-primary hover:bg-primaryHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all transform hover:scale-[1.02]">
+                                Calculate Internals
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="internalResult" class="hidden mt-6 p-4 rounded-lg bg-gray-50 border-l-4 border-primary">
+                        <p class="text-lg text-gray-800 font-medium">Your Total Internal Marks: <span id="internalValue" class="text-3xl font-bold text-primary ml-2">0</span> / 30</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: SGPA CALCULATOR -->
+        <div id="sgpa" class="app-section hidden fade-in">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                <div class="bg-primary px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-file-invoice"></i> SGPA Calculator
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Branch</label>
+                            <select id="branch" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
+                                <option value="cse">CSE</option>
+                                <option value="ece">ECE</option>
+                                <option value="eee">EEE</option>
+                                <option value="it">IT</option>
+                                <option value="mech">MECH</option>
+                                <option value="civil">CIVIL</option>
+                                <option value="chemical">CHEMICAL</option>
+                                <option value="csm">CSM</option>
+                                <option value="cso">CSO</option>
+                                <option value="csbs">CSBS</option>
+                                <option value="csd">CSD</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Year</label>
+                            <select id="year" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
+                                <option value="1">1st Year</option>
+                                <option value="2">2nd Year</option>
+                                <option value="3">3rd Year</option>
+                                <option value="4">4th Year</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Semester</label>
+                            <select id="sem" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
+                                <option value="1">1st Semester</option>
+                                <option value="2">2nd Semester</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="generateSubjectInputs()" class="w-full mb-6 bg-gray-800 text-white py-2 px-4 rounded-lg hover:bg-gray-900 transition">
+                        Load Subjects
+                    </button>
+
+                    <form id="sgpaForm">
+                        <div id="subjectInputs" class="space-y-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+                            <!-- Inputs will be generated here -->
+                            <p class="text-gray-400 italic col-span-2 text-center">Select details and click "Load Subjects" to begin.</p>
+                        </div>
+                    </form>
+
+                    <div id="sgpaDisplayContainer" class="hidden mt-8 text-center p-6 bg-orange-50 rounded-xl border border-orange-200">
+                        <h3 class="text-4xl font-extrabold text-primary" id="sgpaDisplay">SGPA: 0.00</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: CGPA CALCULATOR -->
+        <div id="cgpa" class="app-section hidden fade-in">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                <div class="bg-primary px-6 py-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap"></i> CGPA Calculator
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Number of Semesters Completed</label>
+                        <div class="flex gap-4">
+                            <select id="numSelect" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select>
+                            <button onclick="generateInputFields()" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primaryHover transition">Go</button>
+                        </div>
+                    </div>
+
+                    <div id="inputFieldsContainer" class="space-y-4 mb-6"></div>
+
+                    <button onclick="calculateCGPA()" class="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-900 transition shadow-lg">
+                        Calculate CGPA
+                    </button>
+
+                    <div id="cgpaResult" class="mt-6 text-center text-xl font-bold text-gray-800"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Navigation Logic ---
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.app-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            // Show selected section
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Update Nav Styling (Desktop)
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active-nav', 'text-gray-900');
+                btn.classList.add('text-gray-500');
+            });
+            let activeBtn = document.getElementById('nav-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.add('active-nav', 'text-gray-900');
+                activeBtn.classList.remove('text-gray-500');
+            }
+        }
+
+        function toggleMenu() {
+            const mobileMenu = document.getElementById("mobile-menu");
+            mobileMenu.classList.toggle("hidden");
+        }
+
+        // --- INTERNAL MARKS LOGIC ---
+        function calculateInternals(event) {
+            event.preventDefault();
+
+            let sm1 = parseFloat(document.getElementById("sm1").value) || 0;
+            let sm2 = parseFloat(document.getElementById("sm2").value) || 0;
+            let as1 = parseFloat(document.getElementById("as1").value) || 0;
+            let as2 = parseFloat(document.getElementById("as2").value) || 0;
+            let q1 = parseFloat(document.getElementById("q1").value) || 0;
+            let q2 = parseFloat(document.getElementById("q2").value) || 0;
+            let at = parseFloat(document.getElementById("at").value) || 0;
+
+            let finalMarks = performInternalCalculation(sm1, sm2, as1, as2, q1, q2, at);
+
+            const resultDiv = document.getElementById("internalResult");
+            const resultVal = document.getElementById("internalValue");
+            
+            resultDiv.classList.remove("hidden");
+            resultVal.textContent = finalMarks.toFixed(2);
+        }
+
+        function performInternalCalculation(sm1, sm2, as1, as2, q1, q2, at) {
+            let atte = calculateAttendanceMarks(at);
+            
+            // Logic for Sessionals (80% of best, 20% of least)
+            let finalSm1 = sm1, finalSm2 = sm2;
+            if (sm1 >= sm2) {
+                finalSm1 = sm1 * 0.8;
+                finalSm2 = sm2 * 0.2;
+            } else {
+                finalSm1 = sm1 * 0.2;
+                finalSm2 = sm2 * 0.8;
+            }
+
+            // Logic for Assignments (Similar weightage logic applied to base 12 marks conversion)
+            // Original logic: (Mark/12)*2.8 for best, (Mark/12)*0.7 for least
+            let finalAs1 = as1, finalAs2 = as2;
+            if (as1 >= as2) {
+                finalAs1 = (as1 / 12) * 2.8;
+                finalAs2 = (as2 / 12) * 0.7;
+            } else {
+                finalAs1 = (as1 / 12) * 0.7;
+                finalAs2 = (as2 / 12) * 2.8;
+            }
+
+            // Logic for Quizzes
+            let finalQ1 = q1, finalQ2 = q2;
+            if (q1 >= q2) {
+                finalQ1 = (q1 / 12) * 2.8;
+                finalQ2 = (q2 / 12) * 0.7;
+            } else {
+                finalQ1 = (q1 / 12) * 0.7;
+                finalQ2 = (q2 / 12) * 2.8;
+            }
+
+            return finalSm1 + finalSm2 + finalAs1 + finalAs2 + finalQ1 + finalQ2 + atte;
+        }
+
+        function calculateAttendanceMarks(a) {
+            if (a >= 90) return 5;
+            if (a >= 80) return 4;
+            if (a >= 70) return 3;
+            if (a >= 60) return 2;
+            if (a >= 50) return 1;
+            return 0;
+        }
+
+        // --- SGPA LOGIC ---
+        const credits = {
+            mech: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]], "1.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3], [3, 2]]
+            },
+            civil: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]], "1.2": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3], [3, 2]]
+            },
+            chemical: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 1.5, 3]], "1.2": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3], [3, 1.5, 2]]
+            },
+            cse: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]], "1.2": [[3, 3, 3, 3, 2], [1.5, 1, 1.5, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3], [3, 2]]
+            },
+            it: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]], "1.2": [[3, 3, 3, 3, 2], [1.5, 1, 1.5, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3], [3, 2]]
+            },
+            csm: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]], "1.2": [[3, 3, 3, 3, 2], [1.5, 1.5, 1.5, 1]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3], [3, 2]]
+            },
+            csbs: {
+                "1.1": [[3, 3, 3, 3, 3], [1, 1, 1, 1.5]], "1.2": [[3, 3, 3, 3, 3], [1, 1, 1, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 2, 1.5, 2]], "3.2": [[2, 3, 3, 3, 3, 3], [1, 1, 2]],
+                "4.1": [[2, 3, 3, 3, 3, 3], [1, 3, 2]]
+            },
+            ece: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1, 3, 2]], "1.2": [[3, 3, 3, 3], [1.5, 2, 3, 1]],
+                "2.1": [[3, 4, 3, 3, 3], [1, 1.5, 1, 2]], "2.2": [[3, 3, 4, 3, 3], [1.5, 1, 1, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 2, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [2, 1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 2, 1.5],[ 3, 2]]
+            },
+            cso: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]], "1.2": [[3, 3, 3, 3, 2], [1.5, 1, 1.5, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3], [3, 2]]
+            },
+            eee: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]], "1.2": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[2, 3, 3, 3, 3], [3, 1.5, 1, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3],[ 3, 2]]
+            },
+            csd: {
+                "1.1": [[3, 3, 3, 3], [1.5, 1.5, 3, 1.5]], "1.2": [[3, 3, 3, 3, 2], [1.5, 1, 1.5, 1.5]],
+                "2.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "2.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "3.1": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]], "3.2": [[3, 3, 3, 3, 3], [1.5, 1.5, 1.5, 2]],
+                "4.1": [[3, 3, 3, 3, 3, 3], [3, 2]]
+            }
+        };
+
+        const gradeValues = { "A+": 10, "A": 9, "B": 8, "C": 7, "D": 6, "E": 5, "F": 0 };
+
+        function getSemesterCredits(branch, sem) {
+            return credits[branch] && credits[branch][sem] ? credits[branch][sem] : [[], []];
+        }
+
+        function generateSubjectInputs() {
+            const branch = document.getElementById("branch").value;
+            const sem = `${document.getElementById("year").value}.${document.getElementById("sem").value}`;
+            const container = document.getElementById("subjectInputs");
+            container.innerHTML = "";
+
+            const semesterCredits = getSemesterCredits(branch, sem);
+            const subjects = semesterCredits[0] || [];
+            const labs = semesterCredits[1] || [];
+
+            if(subjects.length === 0 && labs.length === 0) {
+                container.innerHTML = `<p class="text-red-500 col-span-2 text-center">No data available for this selection.</p>`;
+                return;
+            }
+
+            // Helper to create Select box
+            const createSelect = (id, labelText, type) => {
+                const wrapper = document.createElement("div");
+                wrapper.className = type === 'lab' ? "lab-input" : "subject-input";
+                
+                const label = document.createElement("label");
+                label.className = "block text-sm font-medium text-gray-700 mb-1";
+                label.textContent = labelText;
+                
+                const select = document.createElement("select");
+                select.id = id;
+                select.className = "block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border bg-white";
+                
+                Object.keys(gradeValues).forEach(grade => {
+                    const opt = document.createElement("option");
+                    opt.value = grade;
+                    opt.textContent = grade;
+                    select.appendChild(opt);
+                });
+
+                wrapper.appendChild(label);
+                wrapper.appendChild(select);
+                return wrapper;
+            };
+
+            subjects.forEach((_, i) => container.appendChild(createSelect(`subject${i+1}`, `Subject ${i+1}`, 'sub')));
+            labs.forEach((_, i) => container.appendChild(createSelect(`lab${i+1}`, `Lab ${i+1}`, 'lab')));
+
+            // Add Calculate Button
+            const btnDiv = document.createElement("div");
+            btnDiv.className = "col-span-1 md:col-span-2 mt-4";
+            btnDiv.innerHTML = `<button type="button" onclick="calculateSGPA()" class="w-full bg-primary text-white py-3 rounded-lg hover:bg-primaryHover transition font-bold shadow-md">Calculate SGPA</button>`;
+            container.appendChild(btnDiv);
+        }
+
+        function calculateSGPA() {
+            const branch = document.getElementById("branch").value;
+            const sem = `${document.getElementById("year").value}.${document.getElementById("sem").value}`;
+            const semesterCredits = getSemesterCredits(branch, sem);
+            const subjects = document.querySelectorAll(".subject-input select");
+            const labs = document.querySelectorAll(".lab-input select");
+
+            let totalCredits = 0;
+            let totalGradePoints = 0;
+
+            subjects.forEach((select, i) => {
+                const pts = gradeValues[select.value];
+                const cr = semesterCredits[0][i];
+                if (pts !== undefined && cr !== undefined) {
+                    totalCredits += cr;
+                    totalGradePoints += pts * cr;
+                }
+            });
+
+            labs.forEach((select, i) => {
+                const pts = gradeValues[select.value];
+                const cr = semesterCredits[1][i];
+                if (pts !== undefined && cr !== undefined) {
+                    totalCredits += cr;
+                    totalGradePoints += pts * cr;
+                }
+            });
+
+            const sgpa = totalCredits > 0 ? (totalGradePoints / totalCredits) : 0;
+            const display = document.getElementById("sgpaDisplayContainer");
+            display.classList.remove("hidden");
+            document.getElementById("sgpaDisplay").textContent = `SGPA: ${sgpa.toFixed(2)}`;
+        }
+
+        // --- CGPA LOGIC ---
+        function generateInputFields() {
+            const container = document.getElementById('inputFieldsContainer');
+            const num = parseInt(document.getElementById('numSelect').value);
+            container.innerHTML = '';
+
+            for (let i = 1; i <= num; i++) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label class="block text-sm font-medium text-gray-700">SGPA of Semester ${i}</label>
+                    <input type="number" id="marks${i}" step="0.01" class="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" placeholder="0 - 10" oninput="validateInput(this)" required>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function validateInput(input) {
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val < 0 || val > 10) {
+                input.classList.add('border-red-500', 'ring-red-500', 'ring-1');
+                input.classList.remove('border-gray-300');
+            } else {
+                input.classList.remove('border-red-500', 'ring-red-500', 'ring-1');
+                input.classList.add('border-gray-300');
+            }
+        }
+
+        function calculateCGPA() {
+            const num = parseInt(document.getElementById('numSelect').value);
+            let total = 0;
+            let count = 0;
+            let valid = true;
+
+            // Check if inputs exist
+            if(document.getElementById(`marks1`) === null) {
+                alert("Please click 'Go' to generate fields first.");
+                return;
+            }
+
+            for (let i = 1; i <= num; i++) {
+                const input = document.getElementById(`marks${i}`);
+                const val = parseFloat(input.value);
+
+                if (isNaN(val) || val < 0 || val > 10) {
+                    input.classList.add('border-red-500');
+                    valid = false;
+                } else {
+                    total += val;
+                    count++;
+                }
+            }
+
+            const resDiv = document.getElementById('cgpaResult');
+            if (valid && count > 0) {
+                const cgpa = (total / count).toFixed(2);
+                resDiv.innerHTML = `<span class="text-primary text-4xl">CGPA: ${cgpa}</span>`;
+            } else {
+                resDiv.innerHTML = `<span class="text-red-500">Please enter valid SGPA values (0-10).</span>`;
+            }
+        }
+
+        // Initialize default inputs
+        generateInputFields();
+    </script>
+</body>
+</html>
